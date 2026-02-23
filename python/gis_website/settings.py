@@ -16,7 +16,7 @@ LOGIN_URL = '/login'
 
 # Impostazioni di sicurezza per la produzione
 if os.environ.get("PRODUCTION") == '1':
-    DEBUG = True  # TEMPORARY for debugging 500 error
+    DEBUG = os.environ.get('DEBUG', 'False') == 'True'
     SECURE_HSTS_SECONDS = 3600
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True

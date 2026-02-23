@@ -1,8 +1,9 @@
 from django.core.exceptions import ValidationError
 import redis
+from osm_wrapper.utils.namespaced_redis import get_redis_connection
 
 def validate_challenge(challenge_id, challenge_result):
-    r = redis.Redis(host='redis', port=6379, decode_responses=True)
+    r = get_redis_connection()
     expected = r.get("challenge_%d" % int(challenge_id),)
     if challenge_result != expected:
         raise ValidationError("Captcha non valido")

@@ -12,7 +12,7 @@ from osm_wrapper.validators.validators import validate_shape
 from geotiff import GeoTiff
 from json import loads
 from osm_wrapper.utils.line_index_finder import LineIndexFinder
-from osm_wrapper.utils.namespaced_redis import redis_client
+from osm_wrapper.utils.namespaced_redis import redis_client, get_redis_connection
 from osm_wrapper.utils.functional import key_setter
 
 import math
@@ -34,7 +34,7 @@ def get_map(request):
 @login_required
 @require_GET
 def get_box(request):
-    r = redis.Redis(host='redis', port=6379, decode_responses=True)
+    r = get_redis_connection()
     data = {
         'lat1': r.get('lat1') or DEFAULTS_LAT1,
         'lon1': r.get('lon1') or DEFAULTS_LON1,
@@ -231,7 +231,7 @@ def init(request):
     validate_shape(data, shp)
     # Avoid arbitrary paths, just
     validate_slug(data['filename'])
-    r = redis.Redis(host='redis', port=6379, decode_responses=True)
+    r = get_redis_connection()
     r.flushall()
     pipeline = r.pipeline()
     img = GeoTiff('data-sources/source-%s.tif' % data['filename'],  crs_code=32632, as_crs=4326)

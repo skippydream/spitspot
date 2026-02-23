@@ -23,6 +23,7 @@ outweight any "damage" done, as long as this keeps being used for NON-CRITICAL A
 import numpy as np
 from math import e
 import redis
+from .namespaced_redis import get_redis_connection
 
 class CellularAutomaton:
     _hash = {}
@@ -107,7 +108,7 @@ def create_challenge(key_size, state_size, simplicity_factor, small_iters, big_i
     # That's a little bit of magic, I'm prepending four 1's to the result
     # in order to strip them later and preserve leading zeroes
     hex_string = hex(int('1111%s' % ''.join(challenge.astype(str)), 2))[2:]
-    r = redis.Redis(host='redis', port=6379, decode_responses=True)
+    r = get_redis_connection()
     # @todo issue an adequate challenge id. Maybe some client-identifying id.
     challenge_id = 7
     # Challenge expires in 5 minutes in order not to clog redis

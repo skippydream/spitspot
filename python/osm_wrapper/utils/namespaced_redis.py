@@ -9,12 +9,23 @@ import logging
 import redis
 from django.contrib.auth.models import User
 
-def redis_client(user: User):
-    #r = NamespacedRedis(host='redis', port=6379, decode_responses=True)
-    #r.set_prefix(user.username)
-    r = redis.Redis(host='redis', port=6379, decode_responses=True)
+import os
 
-    return r
+def get_redis_connection():
+    """
+    Returns a Redis client using REDIS_URL or REDIS_HOST from environment variables.
+    Defaults to 'redis' if not specified (for docker-compose compatibility).
+    """
+    redis_url = os.environ.get('REDIS_URL')
+    if redis_url:
+        return redis.from_url(redis_url, decode_responses=True)
+    
+    host = os.environ.get('REDIS_HOST', 'redis')
+    port = int(os.environ.get('REDIS_PORT', 6379))
+    return redis.Redis(host=host, port=port, decode_responses=True)
+
+def redis_client(user: User):
+    return get_redis_connection()
 
 class NamespacedRedis(redis.Redis):
     prefix = ""
